@@ -176,7 +176,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 85f6b6839735cc84b86a54b13661bbae, type: 2}
+  - {fileID: 2100000, guid: 2d88cdf92cbe6c14aa5025c16f1979a4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -233,6 +233,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   normalsOutput: {fileID: 8400000, guid: 5685a258bfb241f4a98b81c3f0e1cc1d, type: 2}
+  heightsOutput: {fileID: 8400000, guid: 30ffc781e08014d44aede0f10204d62a, type: 2}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -402,8 +403,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: -0.08717227, y: 0.89959055, z: -0.21045259, w: -0.37262246}
-  m_LocalPosition: {x: 5.2843843, y: 3.699069, z: 5.2843847}
+  m_LocalRotation: {x: -0.05645826, y: 0.9364228, z: -0.17796695, w: -0.2970733}
+  m_LocalPosition: {x: 5.3113737, y: 3.5149477, z: 6.459196}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

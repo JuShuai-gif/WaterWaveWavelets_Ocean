@@ -43,14 +43,19 @@ public class WaterSurfaceWavelets : MonoBehaviour
     private ComputeShader csNormals;
     private int csNormalsMain;
 
+    private ComputeShader csHeight;
+    private int csHeightMain;
+
     // buffers
     private RenderTexture[] bufAmplitude;
     private int bufAmplitudeCurrent = 0;
 
     private RenderTexture bufProfileBuffer;
     private RenderTexture bufNormals;
+    private RenderTexture bufHeight;
 
     public RenderTexture normalsOutput;
+    public RenderTexture heightsOutput;
 
     // 计算频谱
     static float Spectrum(float zeta)
@@ -89,7 +94,7 @@ public class WaterSurfaceWavelets : MonoBehaviour
         return realWorldScale * groupSpeed;
     }
 
-    void OnEnable()
+    void Awake()
     {
         Debug.LogFormat("Group speed: {0}", groupSpeed);
 
@@ -107,6 +112,9 @@ public class WaterSurfaceWavelets : MonoBehaviour
 
         csNormals = Resources.Load<ComputeShader>("WaterSurfaceWaveletsNormals");
         csNormalsMain = csNormals.FindKernel("NormalsMainCS");
+
+        csHeight = Resources.Load<ComputeShader>("WaterSurfaceWaveletsHeight");
+        csHeightMain = csHeight.FindKernel("HeightMainCS");
 
         bufAmplitude = new RenderTexture[] {
             new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.RFloat),
@@ -131,7 +139,20 @@ public class WaterSurfaceWavelets : MonoBehaviour
             bufNormals.enableRandomWrite = true;
             bufNormals.Create();
         }
+        if (heightsOutput != null)
+        {
+            Debug.LogFormat("Height {0} x {1}", heightsOutput.width, heightsOutput.height);
+            bufHeight = new RenderTexture(heightsOutput);
+            bufHeight.enableRandomWrite = true;
+            bufHeight.Create();
+        }
+
+
+
+
     }
+
+
 
     void OnDisable()
     {
@@ -194,10 +215,24 @@ public class WaterSurfaceWavelets : MonoBehaviour
         }
     }
 
+    void StepHeight()
+    {
+        if (bufHeight != null)
+        {
+            csHeight.SetInts("size", bufHeight.width, bufHeight.height);
+            csHeight.SetFloat("period", period);
+            csHeight.SetTexture(csHeightMain, "ampl", bufAmplitude[bufAmplitudeCurrent]);
+            csHeight.SetTexture(csHeightMain, "profile", bufProfileBuffer);
+            csHeight.SetTexture(csHeightMain, "result", bufHeight);
+            csHeight.Dispatch(csHeightMain, bufHeight.width, bufHeight.height, 1);
+            Graphics.CopyTexture(bufHeight, heightsOutput);
+        }
+    }
+
     void Update()
     {
         float dt = Time.deltaTime;
-        Debug.Log("时间" + dt);
+        //Debug.Log("时间" + dt);
         if (Input.GetMouseButton(0))
         {
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -214,5 +249,6 @@ public class WaterSurfaceWavelets : MonoBehaviour
         StepDiffuse(dt);
         StepProfileBuffer();
         StepNormals();
+        StepHeight();
     }
 }

@@ -1,4 +1,4 @@
-﻿#pragma kernel NormalsMainCS
+#pragma kernel HeightMainCS
 
 static const float tau = 6.28318530718f;
 static const int count = 16;
@@ -20,10 +20,9 @@ float amplitude(float3 p)
 	return ampl.SampleLevel(samplerInputLinearClamp, p, 0.0f);
 }
 
-float3 waveNormal(float2 p)
+float3 waveHeight(float2 p)
 {
-	float3 tx = float3(1.0f, 0.0f, 0.0f);
-	float3 tz = float3(0.0f, 0.0f, 1.0f);
+	float3 result = float3(0.0f, 0.0f, 0.0f);
 
 	float da = 1.0f / numNodes;
 	float dx = 16.0f * tau / numNodes;
@@ -37,17 +36,17 @@ float3 waveNormal(float2 p)
 
 		float4 tt = dx * amplitude(float3(p, a)) * profile.SampleLevel(samplerInputLinearRepeat, w, 0.0f);
 
-		tx.xz += kdir.x * tt.zw;
-		tz.zy += kdir.y * tt.zw;
+		result.xz += kdir * tt.x;
+		result.y += tt.y;
 	}
 
-	return normalize(cross(tx,tz));
+	return result;
 }
 
-[numthreads(1,1,1)]
-void NormalsMainCS(uint2 DTid : SV_DispatchThreadID)
+[numthreads(1, 1, 1)]
+void HeightMainCS(uint2 DTid : SV_DispatchThreadID)
 {
 	float2 s = size;
 	float2 p = DTid / s;
-	result[DTid] = waveNormal(p) * 0.5f + 0.5f;
+	result[DTid] = waveHeight(p);
 }
